@@ -8,12 +8,16 @@ const UploadButton = () => {
 
   return (
     <>
-      <Button 
+      <Button
         onClick={() => setModalOpen(true)}
         className="bg-blue-600 hover:bg-blue-700"
       >
-        <Upload className="mr-2 h-4 w-4" />
-        Analyser un document
+        <img
+          src="/icons/uploadDoc.svg"
+          alt="Upload Document"
+          className="mr-2 h-4 w-4"
+        />
+        Create Case
       </Button>
       <UploadModal open={modalOpen} onOpenChange={setModalOpen} />
     </>

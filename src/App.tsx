@@ -6,7 +6,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-react";
+import { ClerkProvider, SignedIn, SignedOut, useUser } from "@clerk/clerk-react";
+import { Bell, Settings as SettingsIcon } from "lucide-react";
+import { useAlerts } from "@/contexts/AlertContext";
+import { useNavigate } from "react-router-dom";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { EventProvider } from "@/contexts/EventContext";
 import { AlertProvider } from "@/contexts/AlertContext";
@@ -62,6 +65,89 @@ const UserProfilePage = lazy(() => import("./pages/UserProfile"));
 
 const queryClient = new QueryClient();
 
+const HeaderContent = () => {
+  const { user } = useUser();
+  const navigate = useNavigate();
+  const { unreadCount } = useAlerts();
+
+  const firstName = user?.firstName || user?.fullName?.split(' ')[0] || 'User';
+
+  return (
+    <header className="w-full ">
+      {/* <div className="flex items-center gap-4">
+        <Suspense fallback={<div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>}>
+          <SidebarTrigger className="text-white hover:bg-white/20 rounded-lg p-2" />
+        </Suspense>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+            <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
+              <rect x="2" y="4" width="28" height="6" fill="white" />
+              <rect x="2" y="22" width="28" height="6" fill="white" />
+              <rect x="13" y="10" width="6" height="12" fill="white" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-white">Hedi</h2>
+        </div>
+      </div> */}
+      <div className="w-[98%] h-20 mt-2 mx-auto">
+        <div
+          className="px-6 py-4 flex items-center justify-between rounded-[12px] shadow-md"
+          style={{
+            background: '#FFFFFF2B',
+            boxShadow: '30.75px 30.75px 71.74px 0px #0D64FF26',
+            backdropFilter: 'blur(10.9px)',
+            border: '1.28px solid',
+            borderImageSource:
+              'linear-gradient(180deg, rgba(255, 255, 255, 0.3) -0.11%, rgba(153, 153, 153, 0) 65.18%)',
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <Suspense fallback={<div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>}>
+              <SidebarTrigger className="text-white hover:bg-white/20 rounded-lg p-2" />
+            </Suspense>
+            <span className="text-2xl font-bold text-slate-900">
+              Hi {firstName}
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <Suspense fallback={<div className="w-24 h-8 bg-white/20 rounded animate-pulse"></div>}>
+              <UploadButton />
+            </Suspense>
+            <button
+              onClick={() => navigate('/alerts')}
+              className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <Bell className="w-5 h-5 text-slate-700" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => navigate('/settings')}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <SettingsIcon className="w-5 h-5 text-slate-700" />
+            </button>
+          </div>
+        </div>
+      </div>
+      {/* <div className="flex items-center gap-4">
+        <Suspense fallback={<div className="w-32 h-8 bg-white/20 rounded animate-pulse"></div>}>
+          <RoleSelector />
+        </Suspense>
+        <Suspense fallback={<div className="w-24 h-8 bg-white/20 rounded animate-pulse"></div>}>
+          <UploadButton />
+        </Suspense>
+        <Suspense fallback={<div className="w-8 h-8 bg-white/20 rounded-full animate-pulse"></div>}>
+          <UserProfile />
+        </Suspense>
+      </div> */}
+    </header>
+  );
+};
+
 const AppContent = () => {
   // Initialize demo data when the app loads
   useEffect(() => {
@@ -72,64 +158,67 @@ const AppContent = () => {
     <BrowserRouter>
       <SignedIn>
         <SidebarProvider>
-          <div className="min-h-screen flex w-full bg-slate-50">
+          {/* <div className="min-h-screen flex w-full" style={{ background: 'linear-gradient(to bottom, #2563eb, #3b82f6, #60a5fa)' }}> */}
+          <div
+            className="min-h-screen flex w-full"
+            style={{
+              background: 'linear-gradient(to bottom, #E3E8FF, #D8F7FF)',
+            }}
+          >
+
             <Suspense fallback={<div className="w-64 bg-white border-r border-slate-200 animate-pulse"></div>}>
               <AppSidebar />
             </Suspense>
             <div className="flex-1 flex flex-col">
-              <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6">
-                <Suspense fallback={<div className="w-8 h-8 bg-gray-200 rounded animate-pulse"></div>}>
-                  <SidebarTrigger className="mr-4" />
-                </Suspense>
-                <div className="flex items-center gap-4">
-                  <Suspense fallback={<div className="w-32 h-8 bg-gray-200 rounded animate-pulse"></div>}>
-                    <RoleSelector />
-                  </Suspense>
-                  <Suspense fallback={<div className="w-24 h-8 bg-gray-200 rounded animate-pulse"></div>}>
-                    <UploadButton />
-                  </Suspense>
-                  <Suspense fallback={<div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>}>
-                    <UserProfile />
-                  </Suspense>
-                </div>
-              </header>
-              <main className="flex-1 p-6">
+              <HeaderContent />
+              <main className="flex-1 p-6 rounded-[12px]"
+                style={{
+                  background: '#FFFFFF2B',
+                  boxShadow: '30.75px 30.75px 71.74px 0px #0D64FF26',
+                  backdropFilter: 'blur(10.9px)',
+                  border: '1.28px solid',
+                  marginLeft: '10px',
+                  marginRight: '10px',
+                  marginBottom: '10px',
+                  borderImageSource: 'linear-gradient(180deg, rgba(255, 255, 255, 0.3) -0.11%, rgba(153, 153, 153, 0) 65.18%)',
+                }}
+              >
                 <Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div></div>}>
                   <Routes>
                     <Route path="/" element={<Navigate to="/alerts" replace />} />
-                    
+                    {/* <Route path="/" element={<Navigate to="/dashboard" replace />} /> */}
                     {/* EVENT-DRIVEN Architecture (Primary) */}
                     <Route path="/alerts" element={<Alerts />} />
                     <Route path="/cases" element={<Cases />} />
                     <Route path="/events" element={<Events />} />
                     <Route path="/risk-profiles" element={<RiskProfiles />} />
-                    
+
                     {/* Role-based Dashboards */}
-                    <Route 
-                      path="/dashboard-gestionnaire" 
+                    <Route
+                      path="/dashboard-gestionnaire"
                       element={
                         <RoleProtectedRoute requiredRole={['gestionnaire', 'admin']}>
                           <DashboardGestionnaire />
                         </RoleProtectedRoute>
-                      } 
+                      }
                     />
-                    <Route 
-                      path="/dashboard-superviseur" 
+                    <Route
+                      path="/dashboard-superviseur"
                       element={
                         <RoleProtectedRoute requiredRole={['superviseur', 'admin']}>
                           <DashboardSuperviseur />
                         </RoleProtectedRoute>
-                      } 
+                      }
                     />
-                    <Route 
-                      path="/dashboard-direction" 
+                    <Route
+                      path="/dashboard-direction"
                       element={
                         <RoleProtectedRoute requiredRole={['direction', 'admin']}>
                           <DashboardDirection />
                         </RoleProtectedRoute>
-                      } 
+                      }
                     />
-                    
+
                     {/* DEPRECATED: Legacy Assuré-centric pages */}
                     <Route path="/assures" element={<Assures />} />
                     <Route path="/demandes" element={<Demandes />} />
@@ -139,26 +228,26 @@ const AppContent = () => {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/analysis-result" element={<AnalysisResult />} />
                     <Route path="/audit" element={<AuditTrail />} />
-                    
+
                     {/* Settings */}
                     <Route path="/api-keys" element={<ApiKeys />} />
                     <Route path="/team" element={<Team />} />
-                    <Route 
-                      path="/role-manager" 
+                    <Route
+                      path="/role-manager"
                       element={
                         <RoleProtectedRoute requiredRole="admin">
                           <RoleManager />
                         </RoleProtectedRoute>
-                      } 
+                      }
                     />
                     <Route path="/user-profile" element={<UserProfilePage />} />
                     <Route path="/usage" element={<Usage />} />
                     <Route path="/settings" element={<Settings />} />
-                    
+
                     {/* Support */}
                     <Route path="/documentation" element={<Documentation />} />
                     <Route path="/feedback" element={<Feedback />} />
-                    
+
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>
