@@ -17,7 +17,7 @@ const UploadButton = () => {
           alt="Upload Document"
           className="mr-2 h-4 w-4"
         />
-        Create Case
+        Analyse Document
       </Button>
       <UploadModal open={modalOpen} onOpenChange={setModalOpen} />
     </>

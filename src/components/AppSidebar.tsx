@@ -126,6 +126,7 @@ export function AppSidebar() {
   }) => {
     const isOpen = openSection === sectionKey;
     const filteredItems = items.filter((item) => !item.adminOnly || isAdmin);
+    const hasActiveRoute = filteredItems.some((item) => isRouteActive(item.url));
     const contentRef = useRef<HTMLDivElement>(null);
     const [height, setHeight] = useState(0);
 
@@ -155,12 +156,17 @@ export function AppSidebar() {
                   src={iconPath}
                   alt=""
                   className="w-5 h-5"
-                  style={{ filter: "brightness(0) invert(0)" }}
+                  style={{ 
+                    filter: hasActiveRoute 
+                      ? "brightness(0) saturate(100%) invert(27%) sepia(96%) saturate(1352%) hue-rotate(230deg) brightness(95%) contrast(91%)"
+                      : "brightness(0) invert(0)"
+                  }}
                 />
               )}
               <span
                 className={`text-base ${isOpen ? "font-bold" : "font-semibold"
-                  } text-[#2B2B2B] tracking-wide`}
+                  } tracking-wide`}
+                style={{ color: hasActiveRoute ? '#455BC9' : '#2B2B2B' }}
               >
                 {title}
               </span>
@@ -199,9 +205,10 @@ export function AppSidebar() {
                     to={item.url}
                     onClick={(e) => e.stopPropagation()}
                     className={`flex items-center justify-between gap-3 px-3 py-2 rounded-md text-sm transition-colors duration-300 ${navIsActive
-                        ? "text-[#2B2B2B] font-medium"
+                        ? "font-medium"
                         : "text-[#2B2B2B]/80 hover:text-[#000]"
                       }`}
+                    style={navIsActive ? { color: '#455BC9' } : {}}
                   >
                     <div className="flex items-center gap-2">
                       {/* <IconComponent className="w-4 h-4" /> */}
