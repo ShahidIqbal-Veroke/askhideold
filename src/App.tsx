@@ -1,5 +1,5 @@
 
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -69,6 +69,7 @@ const HeaderContent = () => {
   const { user } = useUser();
   const navigate = useNavigate();
   const { unreadCount } = useAlerts();
+  const [language, setLanguage] = useState<'ar' | 'eng'>('eng');
 
   const firstName = user?.firstName || user?.fullName?.split(' ')[0] || 'User';
 
@@ -109,12 +110,34 @@ const HeaderContent = () => {
                 </span>
               )}
             </button>
+
+
             <button
               onClick={() => navigate('/settings')}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <SettingsIcon className="w-5 h-5 text-slate-700" />
             </button>
+
+            {/* Language Toggle */}
+            <div className="flex items-center justify-between gap-2">
+              <span className={`text-sm ${language === 'eng' ? 'text-gray-400' : 'text-blue-600 font-medium'}`}>
+                Ar
+              </span>
+              <button
+                onClick={() => setLanguage(language === 'eng' ? 'ar' : 'eng')}
+                className={`relative w-12 h-6 rounded-full transition-all duration-300 ${language === 'eng' ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+              >
+                <span
+                  className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${language === 'eng' ? 'translate-x-6' : 'translate-x-0'
+                    }`}
+                />
+              </button>
+              <span className={`text-sm ${language === 'eng' ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>
+                Eng
+              </span>
+            </div>
           </div>
         </div>
       </div>

@@ -7,19 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import HeaderKPI from '@/components/HeaderKPI';
+import { RiskProfileCard } from '@/components/RiskProfileCard';
+import { RiskProfileDetails } from '@/components/RiskProfileDetails';
 import { 
   Shield, 
-  User, 
-  Search,
-  TrendingUp,
-  AlertTriangle,
-  Clock,
-  Activity,
-  Zap,
-  CheckCircle,
-  XCircle,
-  Eye,
-  BarChart3
+  Search
 } from 'lucide-react';
 
 // Mock data for risk profiles (in real app, this would come from backend)
@@ -122,13 +115,6 @@ const RiskProfiles = () => {
     }
   };
 
-  const getTrendIcon = (trend: string) => {
-    switch (trend) {
-      case 'increasing': return <TrendingUp className="w-4 h-4 text-red-500" />;
-      case 'decreasing': return <TrendingUp className="w-4 h-4 text-green-500 rotate-180" />;
-      default: return <div className="w-4 h-4 bg-gray-400 rounded-full" />;
-    }
-  };
 
   const riskCounts = {
     critical: filteredProfiles.filter(p => p.riskLevel === 'critical').length,
@@ -139,56 +125,32 @@ const RiskProfiles = () => {
     very_low: filteredProfiles.filter(p => p.riskLevel === 'very_low').length
   };
 
+  const kpiCards = [
+    {
+      icon: <img src="/icons/Profilesanalyzed.svg" alt="Profiles Analyzed" className="w-5 h-5" />,
+      title: "Profiles Analyzed",
+      value: filteredProfiles.length
+    },
+    {
+      icon: <img src="/icons/Highrisks.svg" alt="High Risks" className="w-5 h-5" />,
+      title: "High Risks",
+      value: riskCounts.critical + riskCounts.very_high
+    },
+    {
+      icon: <img src="/icons/Confirmedfrauds.svg" alt="Confirmed Frauds" className="w-5 h-5" />,
+      title: "Confirmed Frauds",
+      value: stats?.alerts?.confirmed || 0
+    }
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Risk Profiles</h1>
-          <p className="text-slate-600 mt-1">
-            Risk analysis by person - Event-Driven Architecture
-          </p>
-        </div>
-        
-        {/* Quick Stats */}
-        <div className="flex space-x-4">
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <Shield className="w-5 h-5 text-blue-600" />
-                <div>
-                  <p className="text-2xl font-bold">{filteredProfiles.length}</p>
-                  <p className="text-xs text-slate-600">Profiles analyzed</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
-                <div>
-                  <p className="text-2xl font-bold">{riskCounts.critical + riskCounts.very_high}</p>
-                  <p className="text-xs text-slate-600">High risks</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <div>
-                  <p className="text-2xl font-bold">{stats?.alerts?.confirmed || 0}</p>
-                  <p className="text-xs text-slate-600">Confirmed frauds</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      {/* Header with KPI */}
+      <HeaderKPI
+        title="Risk Profiles"
+        subtitle="Risk analysis by person - Event-Driven Architecture"
+        cards={kpiCards}
+      />
 
       {/* Filters */}
       <Card>
@@ -230,81 +192,19 @@ const RiskProfiles = () => {
         {/* Risk Profiles List */}
         <div className="col-span-5">
           <Card className="h-[calc(100vh-280px)]">
-            <CardHeader>
+            <CardHeader className="flex-shrink-0">
               <CardTitle>Risk Profiles</CardTitle>
             </CardHeader>
-            <CardContent className="overflow-y-auto">
+            <CardContent className="overflow-y-auto max-h-[calc(100%-80px)]">
               <div className="space-y-3">
                 {filteredProfiles.map((profile) => (
-                  <div
+                  <RiskProfileCard
                     key={profile.personId}
+                    profile={profile}
+                    isSelected={selectedPerson === profile.personId}
                     onClick={() => setSelectedPerson(profile.personId)}
-                    className={`p-4 rounded-lg border cursor-pointer transition-all ${
-                      selectedPerson === profile.personId 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-slate-200 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-slate-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-slate-900">{profile.name}</h3>
-                          <p className="text-sm text-slate-500">{profile.personId}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        {getTrendIcon(profile.trend)}
-                        <Badge className={getRiskLevelColor(profile.riskLevel)} variant="outline">
-                          {profile.riskLevel}
-                        </Badge>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
-                      <div className="text-center">
-                        <div className="flex items-center justify-center space-x-1">
-                          <Zap className="w-3 h-3 text-blue-500" />
-                          <span className="font-medium">{profile.totalEvents}</span>
-                        </div>
-                        <p className="text-xs text-slate-500">Events</p>
-                      </div>
-                      
-                      <div className="text-center">
-                        <div className="flex items-center justify-center space-x-1">
-                          <AlertTriangle className="w-3 h-3 text-orange-500" />
-                          <span className="font-medium">{profile.pendingAlerts}</span>
-                        </div>
-                        <p className="text-xs text-slate-500">Alerts</p>
-                      </div>
-                      
-                      <div className="text-center">
-                        <div className="flex items-center justify-center space-x-1">
-                          <XCircle className="w-3 h-3 text-red-500" />
-                          <span className="font-medium">{profile.confirmedFrauds}</span>
-                        </div>
-                        <p className="text-xs text-slate-500">Frauds</p>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-3 flex items-center justify-between text-xs text-slate-500 border-t pt-2">
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-3 h-3" />
-                        <span>
-                          {new Intl.RelativeTimeFormat('en').format(
-                            Math.floor((profile.lastActivity.getTime() - Date.now()) / (24 * 60 * 60 * 1000)),
-                            'day'
-                          )}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <BarChart3 className="w-3 h-3" />
-                        <span>Score: {profile.riskScore}</span>
-                      </div>
-                    </div>
-                  </div>
+                    getRiskLevelColor={getRiskLevelColor}
+                  />
                 ))}
               </div>
             </CardContent>
@@ -314,134 +214,10 @@ const RiskProfiles = () => {
         {/* Person Details */}
         <div className="col-span-7">
           {selectedPerson && personData ? (
-            <Card className="h-[calc(100vh-280px)]">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle>{personData.personId}</CardTitle>
-                    <p className="text-sm text-slate-600 mt-1">
-                      Complete event-driven analysis
-                    </p>
-                  </div>
-                  <Badge className={getRiskLevelColor(personData.summary.currentRiskLevel)} variant="outline">
-                    {personData.summary.currentRiskLevel}
-                  </Badge>
-                </div>
-              </CardHeader>
-              
-              <CardContent>
-                <Tabs defaultValue="summary" className="h-full">
-                  <TabsList>
-                    <TabsTrigger value="summary">Summary</TabsTrigger>
-                    <TabsTrigger value="events">Events</TabsTrigger>
-                    <TabsTrigger value="alerts">Alerts</TabsTrigger>
-                    <TabsTrigger value="risk-factors">Risk Factors</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="summary" className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <Card>
-                        <CardContent className="p-4">
-                          <div className="flex items-center space-x-2">
-                            <Zap className="w-8 h-8 text-blue-600" />
-                            <div>
-                              <p className="text-2xl font-bold">{personData.summary.totalEvents}</p>
-                              <p className="text-sm text-slate-600">Total events</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card>
-                        <CardContent className="p-4">
-                          <div className="flex items-center space-x-2">
-                            <AlertTriangle className="w-8 h-8 text-orange-600" />
-                            <div>
-                              <p className="text-2xl font-bold">{personData.summary.totalAlerts}</p>
-                              <p className="text-sm text-slate-600">Generated alerts</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card>
-                        <CardContent className="p-4">
-                          <div className="flex items-center space-x-2">
-                            <XCircle className="w-8 h-8 text-red-600" />
-                            <div>
-                              <p className="text-2xl font-bold">{personData.summary.confirmedFrauds}</p>
-                              <p className="text-sm text-slate-600">Confirmed frauds</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card>
-                        <CardContent className="p-4">
-                          <div className="flex items-center space-x-2">
-                            <Shield className="w-8 h-8 text-purple-600" />
-                            <div>
-                              <p className="text-lg font-bold">{personData.riskProfile?.riskScore || 'N/A'}</p>
-                              <p className="text-sm text-slate-600">Risk score</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                    
-                    <div className="bg-slate-50 rounded-lg p-4">
-                      <h4 className="font-medium mb-2">Event-Driven Architecture</h4>
-                      <p className="text-sm text-slate-600">
-                        This person's risk profile is calculated in real-time based on events.
-                        Only alerts confirmed as frauds impact the risk score, respecting
-                        the conditional feedback principle.
-                      </p>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="events">
-                    <div className="text-center py-8 text-slate-500">
-                      <Zap className="w-12 h-12 mx-auto mb-3 text-slate-400" />
-                      <p>Events related to this person</p>
-                      <p className="text-sm mt-1">
-                        Events are the source of truth for this profile
-                      </p>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="alerts">
-                    <div className="text-center py-8 text-slate-500">
-                      <AlertTriangle className="w-12 h-12 mx-auto mb-3 text-slate-400" />
-                      <p>Alerts generated from events</p>
-                      <p className="text-sm mt-1">
-                        Risk impact ONLY if fraud confirmed
-                      </p>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="risk-factors">
-                    {personData.riskProfile?.riskFactors && (
-                      <div className="space-y-4">
-                        {Object.entries(personData.riskProfile.riskFactors).map(([factor, score]) => (
-                          <div key={factor} className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-sm font-medium">{factor.replace('_', ' ')}</span>
-                              <span className="text-sm text-slate-600">{Math.round(score as number)}/100</span>
-                            </div>
-                            <div className="w-full bg-slate-200 rounded-full h-2">
-                              <div 
-                                className="bg-blue-600 h-2 rounded-full" 
-                                style={{ width: `${score}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
+            <RiskProfileDetails
+              personData={personData}
+              getRiskLevelColor={getRiskLevelColor}
+            />
           ) : (
             <Card className="h-[calc(100vh-280px)] flex items-center justify-center">
               <div className="text-center">

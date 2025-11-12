@@ -63,7 +63,7 @@ const DashboardItems = ({ role }: { role: string }) => {
 const DataExplorationItems = () => [
   { title: "Profils Risque", url: "/risk-profiles", icon: Shield },
   { title: "Historique", url: "/historique", icon: Clock },
-  { title: "Audit Trail", url: "/audit", icon: History },
+  // { title: "Audit Trail", url: "/audit", icon: History },
 ];
 
 const LegacyItems = () => [
@@ -72,7 +72,7 @@ const LegacyItems = () => [
 ];
 
 const settingsItems = [
-  { title: "API keys", url: "/api-keys", icon: Key },
+  // { title: "API keys", url: "/api-keys", icon: Key },
   { title: "Team", url: "/team", icon: Users },
   { title: "Gestion des rôles", url: "/role-manager", icon: Shield, adminOnly: true },
   { title: "Usage", url: "/usage", icon: Activity },

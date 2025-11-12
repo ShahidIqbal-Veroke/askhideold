@@ -48,7 +48,7 @@ export const HeaderKPI: React.FC<HeaderKPIProps> = ({
                             <div className="absolute top-2.5 right-3">{card.icon}</div>
                         )}
                         <div className="flex flex-col justify-center h-full text-left text-white mt-3">
-                            <p className="text-sm font-medium opacity-90">{card.title}</p>
+                            <p className="text-xs  opacity-90">{card.title}</p>
                             <p className="text-2xl font-bold leading-tight opacity-95">{card.value}</p>
                         </div>
                     </Card>

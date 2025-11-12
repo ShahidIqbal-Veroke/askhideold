@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { teamService } from "@/services/teamService";
+import HeaderKPI from '@/components/HeaderKPI';
 import { 
   FunctionalTeam, 
   TeamMember, 
@@ -239,17 +240,36 @@ export default function Team() {
     );
   }
 
+  const kpiCards = [
+    {
+      icon: <img src="/icons/profile.svg" alt="Total Teams" className="w-5 h-5" />,
+      title: "Total Teams",
+      value: stats?.totalTeams || 0
+    },
+    {
+      icon: <img src="/icons/profile.svg" alt="Total Members" className="w-5 h-5" />,
+      title: "Total Members",
+      value: stats?.totalMembers || 0
+    },
+    {
+      icon: <img src="/icons/today.svg" alt="Active Members" className="w-5 h-5" />,
+      title: "Active Members",
+      value: stats?.activeMembers || 0
+    }
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Gestion des Équipes</h1>
-          <p className="text-slate-600 mt-2">
-            Architecture unifiée : équipes fonctionnelles, membres et permissions
-          </p>
-        </div>
-        <div className="flex gap-2">
+      {/* Header with KPI */}
+      <div>
+        <HeaderKPI
+          title="Team Management"
+          subtitle="Architecture unifiée : équipes fonctionnelles, membres et permissions"
+          cards={kpiCards}
+        />
+        
+        {/* Action Buttons */}
+        <div className="flex gap-2 mt-4">
           <Dialog open={showCreateTeamModal} onOpenChange={setShowCreateTeamModal}>
             <DialogTrigger asChild>
               <Button>

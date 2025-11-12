@@ -224,10 +224,10 @@ const Cases = () => {
       />
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-12 gap-6">
+      <div className="grid grid-cols-12 gap-6 ">
         {/* Cases List (Left) */}
         <div className="col-span-5">
-          <Card className="h-[calc(100vh-200px)]">
+          <Card className="h-[calc(100vh-200px)] rounded-[20px]">
             <CardHeader>
               <div className="flex justify-between items-center mb-2">
                 <CardTitle>Cases</CardTitle>

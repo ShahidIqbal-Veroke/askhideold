@@ -21,14 +21,13 @@ import {
 } from "lucide-react";
 import { useHistorique, useHistoriqueStats } from '@/contexts/HistoriqueContext';
 import { HistoriqueEventType, HistoriqueCategory } from '@/types/historique.types';
+import HeaderKPI from '@/components/HeaderKPI';
 
 const Historique: React.FC = () => {
   const { 
     state, 
     loadHistoriques, 
-    searchHistoriques,
-    getHistoriquesByCategory,
-    getHistoriquesByEventType
+    searchHistoriques
   } = useHistorique();
   
   const { stats } = useHistoriqueStats();
@@ -112,66 +111,37 @@ const Historique: React.FC = () => {
 
   const groupedEvents = groupEventsByDate(state.historiques);
 
+  const kpiCards = [
+    {
+      icon: <img src="/icons/TotalEventsr.svg" alt="Total Events" className="w-5 h-5" />,
+      title: "Total Events",
+      value: stats?.totalEvents || 0
+    },
+    {
+      icon: <img src="/icons/today.svg" alt="This Week" className="w-5 h-5" />,
+      title: "This Week",
+      value: stats?.eventsThisWeek || 0
+    },
+    {
+      icon: <img src="/icons/CompletionRate.svg" alt="Actions Required" className="w-5 h-5" />,
+      title: "Actions Required",
+      value: stats?.actionRequiredCount || 0
+    },
+    {
+      icon: <img src="/icons/Confirmedfrauds.svg" alt="Completion Rate" className="w-5 h-5" />,
+      title: "Completion Rate",
+      value: `${stats?.completionRate?.toFixed(0) || 0}%`
+    }
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900">History</h1>
-        <p className="text-slate-600 mt-2">
-          Complete timeline of events - Archive of interactions and patterns
-        </p>
-      </div>
-
-      {/* KPIs Row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Total Events</p>
-                <p className="text-2xl font-bold text-slate-900">{stats?.totalEvents || 0}</p>
-              </div>
-              <Activity className="h-8 w-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">This Week</p>
-                <p className="text-2xl font-bold text-green-600">{stats?.eventsThisWeek || 0}</p>
-              </div>
-              <Calendar className="h-8 w-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Actions Required</p>
-                <p className="text-2xl font-bold text-red-600">{stats?.actionRequiredCount || 0}</p>
-              </div>
-              <AlertCircle className="h-8 w-8 text-red-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">Completion Rate</p>
-                <p className="text-2xl font-bold text-purple-600">{stats?.completionRate.toFixed(0) || 0}%</p>
-              </div>
-              <CheckCircle className="h-8 w-8 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Header with KPI */}
+      <HeaderKPI
+        title="History"
+        subtitle="Complete timeline of events - Archive of interactions and patterns"
+        cards={kpiCards}
+      />
 
       {/* Filters and Search */}
       <Card>
@@ -216,10 +186,8 @@ const Historique: React.FC = () => {
 
       {/* Tabs for different views */}
       <Tabs defaultValue="timeline" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
-          <TabsTrigger value="categories">By Category</TabsTrigger>
-          <TabsTrigger value="patterns">Patterns</TabsTrigger>
           <TabsTrigger value="stats">Statistics</TabsTrigger>
         </TabsList>
 
@@ -299,64 +267,6 @@ const Historique: React.FC = () => {
                 </Card>
               ))}
           </div>
-        </TabsContent>
-
-        <TabsContent value="categories" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {(['commercial', 'operationnel', 'fraude', 'sinistre', 'compliance', 'technique'] as HistoriqueCategory[]).map((category) => {
-              const categoryEvents = getHistoriquesByCategory(category);
-              return (
-                <Card key={category}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-3">
-                      {getCategoryIcon(category)}
-                      <CardTitle className="text-lg capitalize">{category}</CardTitle>
-                      <Badge variant="outline" className="ml-auto">
-                        {categoryEvents.length}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {categoryEvents.slice(0, 5).map((event) => (
-                        <div key={event.id} className="p-2 bg-slate-50 rounded text-sm">
-                          <div className="font-medium truncate">{event.title}</div>
-                          <div className="text-slate-500 text-xs">
-                            {formatDate(event.createdAt)}
-                          </div>
-                        </div>
-                      ))}
-                      {categoryEvents.length > 5 && (
-                        <div className="text-center">
-                          <Button variant="ghost" size="sm" className="text-xs">
-                            View {categoryEvents.length - 5} more
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="patterns" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Pattern Detection</CardTitle>
-              <CardDescription>
-                Automatically detected patterns in event history
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-slate-500">
-                <BarChart3 className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-                <h3 className="text-lg font-medium mb-2">Patterns under analysis</h3>
-                <p>Detected patterns will be displayed here via HistoriqueContext.detectPatterns()</p>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         <TabsContent value="stats" className="mt-6">
