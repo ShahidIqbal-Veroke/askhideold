@@ -32,7 +32,7 @@ const CoreWorkflowItems = () => {
       icon: Bell,
       badge: unreadCount > 0 ? unreadCount : undefined,
     },
-    { title: "Files", url: "/cases", icon: Folder },
+    { title: "Case", url: "/cases", icon: Folder },
     { title: "Events", url: "/events", icon: Zap },
   ];
 };
@@ -211,17 +211,8 @@ export function AppSidebar() {
                     style={navIsActive ? { color: '#455BC9' } : {}}
                   >
                     <div className="flex items-center gap-2">
-                      {/* <IconComponent className="w-4 h-4" /> */}
                       <span>{item.title}</span>
                     </div>
-                    {/* {item.badge && (
-                      <Badge
-                        variant="destructive"
-                        className="ml-auto bg-red-500 text-white text-xs"
-                      >
-                        {item.badge}
-                      </Badge>
-                    )} */}
                   </NavLink>
                 );
               })

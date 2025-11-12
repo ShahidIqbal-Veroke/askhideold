@@ -74,21 +74,6 @@ const HeaderContent = () => {
 
   return (
     <header className="w-full ">
-      {/* <div className="flex items-center gap-4">
-        <Suspense fallback={<div className="w-8 h-8 bg-white/20 rounded animate-pulse"></div>}>
-          <SidebarTrigger className="text-white hover:bg-white/20 rounded-lg p-2" />
-        </Suspense>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-            <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
-              <rect x="2" y="4" width="28" height="6" fill="white" />
-              <rect x="2" y="22" width="28" height="6" fill="white" />
-              <rect x="13" y="10" width="6" height="12" fill="white" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold text-white">Hedi</h2>
-        </div>
-      </div> */}
       <div className="w-[98%] h-20 mt-2 mx-auto">
         <div
           className="px-6 py-4 flex items-center justify-between rounded-[12px] shadow-md"
@@ -133,17 +118,6 @@ const HeaderContent = () => {
           </div>
         </div>
       </div>
-      {/* <div className="flex items-center gap-4">
-        <Suspense fallback={<div className="w-32 h-8 bg-white/20 rounded animate-pulse"></div>}>
-          <RoleSelector />
-        </Suspense>
-        <Suspense fallback={<div className="w-24 h-8 bg-white/20 rounded animate-pulse"></div>}>
-          <UploadButton />
-        </Suspense>
-        <Suspense fallback={<div className="w-8 h-8 bg-white/20 rounded-full animate-pulse"></div>}>
-          <UserProfile />
-        </Suspense>
-      </div> */}
     </header>
   );
 };
@@ -158,9 +132,7 @@ const AppContent = () => {
     <BrowserRouter>
       <SignedIn>
         <SidebarProvider>
-          {/* <div className="min-h-screen flex w-full" style={{ background: 'linear-gradient(to bottom, #2563eb, #3b82f6, #60a5fa)' }}> */}
-          <div
-            className="min-h-screen flex w-full"
+          <div className="min-h-screen flex w-full"
             style={{
               background: 'linear-gradient(to bottom, #E3E8FF, #D8F7FF)',
             }}

@@ -3,7 +3,7 @@ import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Upload, File, X, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+import { File, X, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FraudDetectionService, type FraudAnalysisResult } from "@/services/fraudDetectionService";
@@ -53,13 +53,33 @@ export function UploadModal({ open, onOpenChange }: UploadModalProps) {
     setDragActive(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setSelectedFile(e.dataTransfer.files[0]);
+      const file = e.dataTransfer.files[0];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        toast({
+          title: "File too large",
+          description: "File size must be 5MB or less",
+          variant: "destructive",
+        });
+        return;
+      }
+      setSelectedFile(file);
     }
-  }, []);
+  }, [toast]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        toast({
+          title: "File too large",
+          description: "File size must be 5MB or less",
+          variant: "destructive",
+        });
+        return;
+      }
+      setSelectedFile(file);
     }
   };
 
@@ -209,23 +229,22 @@ export function UploadModal({ open, onOpenChange }: UploadModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center space-x-2">
-            <Upload className="w-5 h-5 text-blue-600" />
-            <span>Upload Document</span>
+      <DialogContent className="max-w-2xl rounded-3xl shadow-2xl">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-2xl font-bold text-black text-center">
+            Upload Your Document
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Upload Zone */}
           <div
-            className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+            className={`relative border-2 border-dashed rounded-3xl p-8 transition-all ${
               dragActive 
                 ? "border-blue-500 bg-blue-50" 
                 : selectedFile 
                   ? "border-green-500 bg-green-50" 
-                  : "border-slate-300 hover:border-slate-400"
+                  : "border-slate-300 hover:border-slate-400 hover:bg-slate-100"
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
@@ -237,31 +256,56 @@ export function UploadModal({ open, onOpenChange }: UploadModalProps) {
               id="file-upload"
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               onChange={handleFileSelect}
-              accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
+              accept=".jpg,.jpeg,.png,.pdf,.docx,image/jpeg,image/png,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             />
             
-            {selectedFile ? (
-              <div className="space-y-2">
-                <File className="w-12 h-12 text-green-600 mx-auto" />
-                <p className="text-green-700 font-medium">{selectedFile.name}</p>
-                <p className="text-sm text-green-600">
-                  {(selectedFile.size / 1024 / 1024).toFixed(1)} Mo • Prêt pour analyse
-                </p>
+            <div className="flex items-center justify-between gap-6">
+              <div className="flex items-center gap-2 justify-center flex-1 min-w-0">
+                {selectedFile ? (
+                  <>
+                    <div className="flex-shrink-0">
+                      <File className="w-12 h-12 text-green-600" />
+                    </div>
+                    <div className="text-left min-w-0">
+                      <p className="text-green-700 font-semibold text-base truncate">{selectedFile.name}</p>
+                      <p className="text-sm text-green-600 mt-1">
+                        {(selectedFile.size / 1024 / 1024).toFixed(1)} MB • Ready for analysis
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex-shrink-0">
+                      <img src="/icons/gallery.svg" alt="Gallery" className="w-12 h-12" />
+                    </div>
+                    <div className="text-xs">
+                      <p className="text-slate-800 font-semibold text-base mb-2">
+                        Drag and drop your Files
+                      </p>
+                      <p className="text-sm text-slate-600 mb-1">
+                        File formats are DOCX, PNG, JPG, PDF
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        File size: 5MB max
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
-            ) : (
-              <div className="space-y-2">
-                <File className="w-12 h-12 text-slate-400 mx-auto" />
-                <p className="text-slate-700 font-medium">
-                  Glissez-déposez vos documents ici
-                </p>
-                <p className="text-sm text-slate-500">
-                  ou cliquez pour parcourir
-                </p>
-                <p className="text-xs text-slate-400">
-                  JPG, PNG, PDF • Max 10 Mo
-                </p>
-              </div>
-            )}
+              
+              {!selectedFile && (
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    document.getElementById('file-upload')?.click();
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-5 py-2.5 rounded-3xl font-medium flex-shrink-0 shadow-md hover:shadow-lg transition-all"
+                >
+                  <img src="/icons/document-upload.svg" alt="Upload" className="w-5 h-5" />
+                  <span>Upload Documents</span>
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Analysis Progress */}
@@ -319,16 +363,20 @@ export function UploadModal({ open, onOpenChange }: UploadModalProps) {
           {/* Recent Uploads */}
 
           {/* Actions */}
-          <div className="flex justify-end space-x-3 pt-4 border-t">
-            <Button variant="outline" onClick={handleClose}>
-              Annuler
+          <div className="flex justify-center gap-3 pt-2">
+            <Button 
+              variant="outline" 
+              onClick={handleClose}
+              className="border-2 border-blue-600 text-blue-600 bg-white hover:bg-blue-50 px-8 py-2.5 font-medium rounded-xl transition-all min-w-[160px]"
+            >
+              Cancel
             </Button>
             <Button 
               onClick={handleAnalyze} 
               disabled={!selectedFile || isAnalyzing}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 font-medium rounded-xl shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed min-w-[160px]"
             >
-              {isAnalyzing ? "Analyse en cours..." : "Analyser"}
+              {isAnalyzing ? "Analyse en cours..." : "Analyse"}
             </Button>
           </div>
         </div>
