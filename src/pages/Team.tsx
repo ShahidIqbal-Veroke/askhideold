@@ -242,19 +242,24 @@ export default function Team() {
 
   const kpiCards = [
     {
-      icon: <img src="/icons/profile.svg" alt="Total Teams" className="w-5 h-5" />,
-      title: "Total Teams",
+      icon: <img src="/icons/ActiveTeams.svg" alt="Total Teams" className="w-5 h-5" />,
+      title: "Équipes Actives",
       value: stats?.totalTeams || 0
     },
     {
-      icon: <img src="/icons/profile.svg" alt="Total Members" className="w-5 h-5" />,
-      title: "Total Members",
-      value: stats?.totalMembers || 0
+      icon: <img src="/icons/ActiveMembers.svg" alt="Total Members" className="w-5 h-5" />,
+      title: "Membres Actifs",
+      value: stats ? `${stats.activeMembers} / ${stats.totalMembers}` : '0 / 0'
     },
     {
-      icon: <img src="/icons/today.svg" alt="Active Members" className="w-5 h-5" />,
-      title: "Active Members",
-      value: stats?.activeMembers || 0
+      icon: <img src="/icons/UsageRate.svg" alt="Taux Utilisation" className="w-5 h-5" />,
+      title: "Taux Utilisation",
+      value: stats?.capacity ? `${(stats.capacity.utilizationRate * 100).toFixed(0)}%` : '0%'
+    },
+    {
+      icon: <img src="/icons/ClientSatisfaction.svg" alt="Satisfaction Client" className="w-5 h-5" />,
+      title: "Client Satisfaction",
+      value: stats?.overallPerformance ? `${stats.overallPerformance.customerSatisfaction.toFixed(1)}/5` : '0.0/5'
     }
   ];
 
@@ -269,7 +274,7 @@ export default function Team() {
         />
         
         {/* Action Buttons */}
-        <div className="flex gap-2 mt-4">
+        <div className="flex gap-2 mt-4 justify-end">
           <Dialog open={showCreateTeamModal} onOpenChange={setShowCreateTeamModal}>
             <DialogTrigger asChild>
               <Button>
@@ -424,151 +429,14 @@ export default function Team() {
         </div>
       </div>
 
-      {/* Statistiques globales */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-600">Équipes Actives</p>
-                  <p className="text-2xl font-bold text-slate-900">{stats.totalTeams}</p>
-                </div>
-                <Building2 className="h-8 w-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-600">Membres Actifs</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.activeMembers}</p>
-                  <p className="text-xs text-slate-500">sur {stats.totalMembers} total</p>
-                </div>
-                <Users className="h-8 w-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-600">Taux Utilisation</p>
-                  <p className="text-2xl font-bold text-purple-600">{(stats.capacity.utilizationRate * 100).toFixed(0)}%</p>
-                </div>
-                <Target className="h-8 w-8 text-purple-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-600">Satisfaction Client</p>
-                  <p className="text-2xl font-bold text-orange-600">{stats.overallPerformance.customerSatisfaction.toFixed(1)}</p>
-                  <p className="text-xs text-slate-500">sur 5.0</p>
-                </div>
-                <Star className="h-8 w-8 text-orange-600" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
       {/* Interface principale avec onglets */}
-      <Tabs defaultValue="teams" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="teams">Équipes Fonctionnelles ({functionalTeams.length})</TabsTrigger>
+      <Tabs defaultValue="members" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="members">Membres ({teamMembers.length})</TabsTrigger>
           <TabsTrigger value="analytics">Analytics & Performance</TabsTrigger>
         </TabsList>
 
-        {/* Onglet Équipes Fonctionnelles */}
-        <TabsContent value="teams" className="mt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            {functionalTeams.map((team) => (
-              <Card key={team.id} className="cursor-pointer hover:shadow-md">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      {getSpecialtyIcon(team.specialty)}
-                      <div>
-                        <h3 className="font-semibold text-slate-900">{team.name}</h3>
-                        <p className="text-sm text-slate-600">{getSpecialtyLabel(team.specialty)}</p>
-                      </div>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Modifier
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDeleteTeam(team.id)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Supprimer
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-3">
-                    <p className="text-sm text-slate-600 line-clamp-2">
-                      {team.description}
-                    </p>
-                    
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-slate-500">Capacité</p>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{teamMembers.filter(m => m.functionalTeams.includes(team.id)).length}/{team.maxCapacity}</span>
-                          <Progress value={(teamMembers.filter(m => m.functionalTeams.includes(team.id)).length / team.maxCapacity) * 100} className="flex-1 h-2" />
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-slate-500">SLA</p>
-                        <p className="font-medium">{team.slaHours}h</p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-slate-500">Taux Completion</p>
-                        <p className="font-medium text-green-600">{team.stats.completionRate}%</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500">Coût/heure</p>
-                        <p className="font-medium">{team.costPerHour}€</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-1">
-                      {team.specialties.slice(0, 2).map((specialty, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs">
-                          {specialty}
-                        </Badge>
-                      ))}
-                      {team.specialties.length > 2 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{team.specialties.length - 2}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
+    
 
         {/* Onglet Membres */}
         <TabsContent value="members" className="mt-6">
